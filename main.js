@@ -37,10 +37,10 @@ module.exports.loop = function () {
     if (Object.keys(harvesters).length < 6) {
         const name = "Harvester" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "harvester", enabled: true, source: harvesters1 > harvesters0 ? 0 : 1 }});
-    } else if (Object.keys(upgraders).length < 2) {
+    } else if (Object.keys(upgraders).length < 1) {
         const name = "Upgrader" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "upgrader", enabled: true }});
-    } else if (Object.keys(builders).length < 1) {
+    } else if (Object.keys(builders).length < 2) {
         const name = "Builder" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "builder", enabled: true }});
     } else if (Object.keys(repairers).length < 1) {
