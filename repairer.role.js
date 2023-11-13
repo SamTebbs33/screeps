@@ -40,9 +40,9 @@ const repairerRole = {
                         creep.memory.source = 0;
                 }
             }
-        } else if (creep.memory.mode == "building") {
+        } else if (creep.memory.mode == "repairing") {
             const site = targets[0];
-            if (creep.build(site) == ERR_NOT_IN_RANGE) {
+            if (creep.repair(site) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(site, { visualizePathStyle: { stroke: "#fff" } });
             }
         }
