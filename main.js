@@ -5,6 +5,7 @@ const repairerRole = require("repairer.role");
 
 module.exports.loop = function () {
     const spawn1 = Game.spawns["Spawn1"];
+    var sources = spawn1.room.find(FIND_SOURCES);
 
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -25,10 +26,17 @@ module.exports.loop = function () {
     const repairers = _.filter(Game.creeps, function(creep){
         return creep.memory.role == "repairer";
     });
+
+    var harvesters1 = 0;
+    var harvesters0 = 0;
+    for (var harvester in harvesters) {
+        if (harvesters[harvester].memory.source == 0) harvesters0++;
+        else harvesters1++;
+    }
     
     if (Object.keys(harvesters).length < 6) {
         const name = "Harvester" + Game.time;
-        spawn1.spawnCreep([MOVE, WORK, CARRY, MOVE], name, {memory: { role: "harvester", enabled: true, sourceDest: 0 }});
+        spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "harvester", enabled: true, source: harvesters1 > harvesters0 ? 0 : 1 }});
     } else if (Object.keys(upgraders).length < 2) {
         const name = "Upgrader" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "upgrader", enabled: true }});
