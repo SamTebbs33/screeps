@@ -3,6 +3,8 @@ const builderRole = require("builder.role");
 const upgraderRole = require("upgrader.role");
 const repairerRole = require("repairer.role");
 
+const numHarvesters = 6;
+
 module.exports.loop = function () {
     const spawn1 = Game.spawns["Spawn1"];
     var sources = spawn1.room.find(FIND_SOURCES);
@@ -34,13 +36,16 @@ module.exports.loop = function () {
         else harvesters1++;
     }
     
-    if (Object.keys(harvesters).length < 6) {
+    const disableBuilders = Object.keys(harvesters).length < numHarvesters;
+    const disableUpgraders = disableBuilders;
+
+    if (Object.keys(harvesters).length < numHarvesters) {
         const name = "Harvester" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "harvester", enabled: true, source: harvesters1 > harvesters0 ? 0 : 1 }});
     } else if (Object.keys(upgraders).length < 1) {
         const name = "Upgrader" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "upgrader", enabled: true }});
-    } else if (Object.keys(builders).length < 2) {
+    } else if (Object.keys(builders).length < 1) {
         const name = "Builder" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "builder", enabled: true }});
     } else if (Object.keys(repairers).length < 1) {
@@ -52,13 +57,17 @@ module.exports.loop = function () {
         var creep = harvesters[name];
         if (creep.memory.enabled) harvesterRole.run(creep);
     }
-    for (var name in builders) {
-        var creep = builders[name];
-        if (creep.memory.enabled) builderRole.run(creep);
+    if (!disableBuilders) {
+        for (var name in builders) {
+            var creep = builders[name];
+            if (creep.memory.enabled) builderRole.run(creep);
+        }
     }
-    for (var name in upgraders) {
-        var creep = upgraders[name];
-        if (creep.memory.enabled) upgraderRole.run(creep);
+    if (!disableUpgraders) {
+        for (var name in upgraders) {
+            var creep = upgraders[name];
+            if (creep.memory.enabled) upgraderRole.run(creep);
+        }
     }
     for (var name in repairers) {
         var creep = repairers[name];
