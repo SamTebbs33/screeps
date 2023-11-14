@@ -1,13 +1,16 @@
-const harvesterRole = require("harvester.role");
 const builderRole = require("builder.role");
 const upgraderRole = require("upgrader.role");
 const repairerRole = require("repairer.role");
+const haulerRole = require("hauler.role");
+const minerRole = require("miner.role");
 
-const numHarvesters = 6;
+const numHarvesters = 0;
+const numHaulers = 8;
 
 module.exports.loop = function () {
     const spawn1 = Game.spawns["Spawn1"];
     var sources = spawn1.room.find(FIND_SOURCES);
+    const numMiners = Object.keys(sources).length;
 
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -16,9 +19,6 @@ module.exports.loop = function () {
         }
     }
     
-    const harvesters = _.filter(Game.creeps, function(creep){
-        return creep.memory.role == "harvester";
-    });
     const builders = _.filter(Game.creeps, function(creep){
         return creep.memory.role == "builder";
     });
@@ -28,21 +28,30 @@ module.exports.loop = function () {
     const repairers = _.filter(Game.creeps, function(creep){
         return creep.memory.role == "repairer";
     });
-
-    var harvesters1 = 0;
-    var harvesters0 = 0;
-    for (var harvester in harvesters) {
-        if (harvesters[harvester].memory.source == 0) harvesters0++;
-        else harvesters1++;
+    const haulers = _.filter(Game.creeps, function(creep){
+        return creep.memory.role == "hauler";
+    });
+    const miners = _.filter(Game.creeps, function(creep){
+        return creep.memory.role == "miner";
+    });
+    
+    var miners1 = 0;
+    var miners0 = 0;
+    for (var miner in miners) {
+        if (miners[miner].memory.source == 0) miners0++;
+        else miners1++;
     }
     
-    const disableBuilders = Object.keys(harvesters).length < numHarvesters;
+    const disableBuilders = Object.keys(miners).length < numMiners || Object.keys(haulers).length < numHaulers;
     const disableUpgraders = disableBuilders;
-
-    if (Object.keys(harvesters).length < numHarvesters) {
-        const name = "Harvester" + Game.time;
-        spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "harvester", enabled: true, source: harvesters1 > harvesters0 ? 0 : 1 }});
-    } else if (Object.keys(upgraders).length < 1) {
+    
+    if (Object.keys(miners).length < numMiners) {
+        const name = "Miner" + Game.time;
+        spawn1.spawnCreep([WORK, WORK, MOVE], name, {memory: { role: "miner", enabled: true, source: miners1 > miners0 ? 0 : 1 }});
+    } else if (Object.keys(haulers).length < numHaulers) {
+        const name = "Hauler" + Game.time;
+        spawn1.spawnCreep([MOVE, CARRY, CARRY, MOVE], name, {memory: { role: "hauler", enabled: true }});
+    } else if (Object.keys(upgraders).length < 3) {
         const name = "Upgrader" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "upgrader", enabled: true }});
     } else if (Object.keys(builders).length < 1) {
@@ -53,10 +62,6 @@ module.exports.loop = function () {
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "repairer", enabled: true }});
     }
 
-    for (var name in harvesters) {
-        var creep = harvesters[name];
-        if (creep.memory.enabled) harvesterRole.run(creep);
-    }
     if (!disableBuilders) {
         for (var name in builders) {
             var creep = builders[name];
@@ -72,5 +77,13 @@ module.exports.loop = function () {
     for (var name in repairers) {
         var creep = repairers[name];
         if (creep.memory.enabled) repairerRole.run(creep);
+    }
+    for (var name in haulers) {
+        var creep = haulers[name];
+        if (creep.memory.enabled) haulerRole.run(creep);
+    }
+    for (var name in miners) {
+        var creep = miners[name];
+        if (creep.memory.enabled) minerRole.run(creep);
     }
 }

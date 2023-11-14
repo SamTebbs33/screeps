@@ -1,15 +1,18 @@
-const harvesterRole = {
+const haulerRole = {
     run: function(creep) {
-        if (!creep.memory.source) creep.memory.source = 0;
+        var sources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: function(res) {
+            return res.resourceType == RESOURCE_ENERGY;
+        }});
+        sources.sort((a,b) => b.amount - a.amount);
+        const source = sources[0];
 
-        var sources = creep.room.find(FIND_SOURCES);
         var targets = creep.room.find(FIND_MY_STRUCTURES);
         targets = _.filter(targets, function (struct) {
             return struct.structureType == STRUCTURE_SPAWN || struct.structureType == STRUCTURE_EXTENSION;
         });
-        if (creep.store[RESOURCE_ENERGY] < creep.store.getCapacity()) {
-            if (creep.harvest(sources[creep.memory.source]) == ERR_NOT_IN_RANGE)
-                creep.moveTo(sources[creep.memory.source], { visualizePathStyle: { stroke: "#fff" } });
+        if (creep.store[RESOURCE_ENERGY] < creep.store.getCapacity() && source) {
+            if (creep.pickup(source) == ERR_NOT_IN_RANGE)
+                creep.moveTo(source, { visualizePathStyle: { stroke: "#fff" } });
         } else {
             var target = 0;
             var targetSpace = 0;
@@ -27,4 +30,4 @@ const harvesterRole = {
     }
 }
 
-module.exports = harvesterRole;
+module.exports = haulerRole;
