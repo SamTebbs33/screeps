@@ -1,19 +1,23 @@
 const haulerRole = {
     run: function(creep) {
-        var sources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: function(res) {
-            return res.resourceType == RESOURCE_ENERGY;
-        }});
-        sources.sort((a,b) => b.amount - a.amount);
-        const source = sources[0];
+        if (!creep.memory.source) creep.memory.source = "";
 
-        var targets = creep.room.find(FIND_MY_STRUCTURES);
-        targets = _.filter(targets, function (struct) {
-            return struct.structureType == STRUCTURE_SPAWN || struct.structureType == STRUCTURE_EXTENSION;
-        });
+        var source = Game.getObjectById(creep.memory.source);
+
+        if (!source) {
+            source = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: function(res) {
+                return res.resourceType == RESOURCE_ENERGY;
+            }});
+            if (source) creep.memory.source = source.id;
+        }
+
         if (creep.store[RESOURCE_ENERGY] < creep.store.getCapacity() && source) {
             if (creep.pickup(source) == ERR_NOT_IN_RANGE)
                 creep.moveTo(source, { visualizePathStyle: { stroke: "#fff" } });
         } else {
+            var targets = creep.room.find(FIND_MY_STRUCTURES, { filter: function (struct) {
+                return struct.structureType == STRUCTURE_SPAWN || struct.structureType == STRUCTURE_EXTENSION;
+            }});
             var target = 0;
             var targetSpace = 0;
             for (var t in targets) {
