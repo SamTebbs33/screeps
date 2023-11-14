@@ -29,7 +29,7 @@ const upgraderRole = {
                 if (creep.moveTo(src, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH) {
                     creep.memory.source++;
                     if (creep.memory.source >= spawns.length)
-                        creep.mmeory.source = 0;
+                        creep.memory.source = 0;
                 }
             }
         } else if (creep.memory.mode == "upgrading") {
