@@ -3,9 +3,14 @@ const repairerRole = {
         if (!creep.memory.source) creep.memory.source = 0;
         if (!creep.memory.mode) creep.memory.mode = "repairing";
 
-        const targets = creep.room.find(FIND_STRUCTURES, {
-            filter: object => object.hits < object.hitsMax && object.structureType != STRUCTURE_WALL
+        var targets = creep.room.find(FIND_STRUCTURES, {
+            filter: object => object.hits < object.hitsMax && object.structureType != STRUCTURE_WALL && object.structureType != STRUCTURE_RAMPART
         });
+        if (Object.keys(targets).length == 0) {
+            targets = creep.room.find(FIND_STRUCTURES, {
+                filter: object => object.hits < object.hitsMax && (object.structureType == STRUCTURE_WALL || object.structureType == STRUCTURE_RAMPART)
+            });
+        }
 
         targets.sort((a,b) => a.hits - b.hits);
         var sources = creep.room.find(FIND_MY_STRUCTURES);
