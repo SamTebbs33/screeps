@@ -4,8 +4,10 @@ const repairerRole = require("repairer.role");
 const haulerRole = require("hauler.role");
 const minerRole = require("miner.role");
 
-const numHarvesters = 0;
 const numHaulers = 8;
+const numUpgraders = 5;
+const numBuilders = 1;
+const numRepairers = 1;
 
 module.exports.loop = function () {
     const spawn1 = Game.spawns["Spawn1"];
@@ -51,13 +53,13 @@ module.exports.loop = function () {
     } else if (Object.keys(haulers).length < numHaulers) {
         const name = "Hauler" + Game.time;
         spawn1.spawnCreep([MOVE, CARRY, CARRY, MOVE], name, {memory: { role: "hauler", enabled: true }});
-    } else if (Object.keys(upgraders).length < 3) {
+    } else if (Object.keys(upgraders).length < numUpgraders) {
         const name = "Upgrader" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "upgrader", enabled: true }});
-    } else if (Object.keys(builders).length < 1) {
+    } else if (Object.keys(builders).length < numBuilders) {
         const name = "Builder" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "builder", enabled: true }});
-    } else if (Object.keys(repairers).length < 1) {
+    } else if (Object.keys(repairers).length < numRepairers) {
         const name = "Repairer" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "repairer", enabled: true }});
     }
