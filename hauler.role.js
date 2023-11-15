@@ -1,3 +1,5 @@
+const b = require("behaviours");
+
 const haulerRole = {
     run: function(creep) {
         if (!creep.memory.source) creep.memory.source = "";
@@ -15,9 +17,7 @@ const haulerRole = {
             if (creep.pickup(source) == ERR_NOT_IN_RANGE)
                 creep.moveTo(source, { visualizePathStyle: { stroke: "#fff" } });
         } else {
-            var targets = creep.room.find(FIND_MY_STRUCTURES, { filter: function (struct) {
-                return struct.structureType == STRUCTURE_SPAWN || struct.structureType == STRUCTURE_EXTENSION;
-            }});
+            const targets = b.findEnergyStorage(creep.room);
             var target = 0;
             var targetSpace = 0;
             for (var t in targets) {

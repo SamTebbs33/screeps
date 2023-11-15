@@ -1,3 +1,5 @@
+const b = require("behaviours");
+
 const repairerRole = {
     run: function(creep) {
         if (!creep.memory.source) creep.memory.source = 0;
@@ -27,24 +29,7 @@ const repairerRole = {
         }
         
         if (creep.memory.mode == "filling") {
-            var bestSpawn = 0;
-            var mostSpawn = 0;
-            for (var x in sources) {
-                const energy = sources[x].store[RESOURCE_ENERGY];
-                if (energy > mostSpawn) {
-                    bestSpawn = x;
-                    mostSpawn = energy;
-                }
-            }
-            creep.memory.source = bestSpawn;
-            const src = sources[creep.memory.source];
-            if (creep.withdraw(src, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                if (creep.moveTo(src, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH) {
-                    creep.memory.source++;
-                    if (creep.memory.source >= sources.length)
-                        creep.memory.source = 0;
-                }
-            }
+            creep.memory.source = b.findAndWithdrawEnergy(creep, creep.memory.source);
         } else if (creep.memory.mode == "repairing") {
             const site = targets[0];
             if (creep.repair(site) == ERR_NOT_IN_RANGE) {
