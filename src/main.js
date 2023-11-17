@@ -22,19 +22,19 @@ module.exports.loop = function () {
     }
     
     const builders = _.filter(Game.creeps, function(creep){
-        return creep.memory.role == "builder";
+        return creep.memory.role === "builder";
     });
     const upgraders = _.filter(Game.creeps, function(creep){
-        return creep.memory.role == "upgrader";
+        return creep.memory.role === "upgrader";
     });
     const repairers = _.filter(Game.creeps, function(creep){
-        return creep.memory.role == "repairer";
+        return creep.memory.role === "repairer";
     });
     const haulers = _.filter(Game.creeps, function(creep){
-        return creep.memory.role == "hauler";
+        return creep.memory.role === "hauler";
     });
     const miners = _.filter(Game.creeps, function(creep){
-        return creep.memory.role == "miner";
+        return creep.memory.role === "miner";
     });
     
     var miners1 = 0;
