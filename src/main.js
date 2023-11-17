@@ -20,7 +20,14 @@ module.exports.loop = function () {
             console.log('Clearing non-existing creep memory:', name);
         }
     }
-    
+
+    const towers = spawn1.room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType == STRUCTURE_TOWER });
+    for (var x in towers) {
+        const tower = towers[x];
+        const target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (target) tower.attack(target);
+    }
+
     const builders = _.filter(Game.creeps, function(creep){
         return creep.memory.role === "builder";
     });
