@@ -1,3 +1,5 @@
+const u = require("utils");
+
 /**
  * Find all energy storage structures in the room.
  **/
@@ -19,15 +21,13 @@ function findAndWithdrawEnergy(creep, preferred) {
             most = energy;
         }
     }
-    const src = stores[preferred];
+    const src = stores[best];
     if (creep.withdraw(src, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
         if (creep.moveTo(src, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH) {
-            preferred++;
-            if (preferred >= stores.length)
-                preferred = 0;
+            best = u.clampLength(best + 1, stores);
         }
     }
-    return preferred;
+    return best;
 }
 
 module.exports = {
