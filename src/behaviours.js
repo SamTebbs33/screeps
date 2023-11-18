@@ -38,7 +38,7 @@ function findAndTransferEnergy(creep, id) {
     if (!target) {
         target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
             const type = res.structureType;
-            return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION) && res.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+            return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION || type == STRUCTURE_TOWER) && res.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
         }});
         if(!target) return "";
     }
@@ -46,7 +46,7 @@ function findAndTransferEnergy(creep, id) {
     if (err == ERR_FULL || (err == ERR_NOT_IN_RANGE && creep.moveTo(target, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH)) {
         target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
             const type = res.structureType;
-            return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION) && res.id !== target.id && res.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+            return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION || type == STRUCTURE_TOWER) && res.id !== target.id && res.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
         }});
     }
     return target ? target.id : "";
