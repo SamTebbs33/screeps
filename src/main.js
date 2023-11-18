@@ -4,10 +4,49 @@ const repairerRole = require("repairer.role");
 const haulerRole = require("hauler.role");
 const minerRole = require("miner.role");
 
+const u = require("utils");
+
 const numHaulers = 8;
 const numUpgraders = 5;
-const numBuilders = 1;
+const numBuilders = 2;
 const numRepairers = 1;
+
+
+function runTowers(spawn) {
+    const towers = spawn.room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType == STRUCTURE_TOWER });
+    for (var x in towers) {
+        const tower = towers[x];
+        const target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (target) tower.attack(target);
+    }
+
+}
+
+function updateResourceTracking() {
+    for (var name in Game.rooms) {
+        var room = Game.rooms[name];
+        if (room.energyCapacityAvailable == 0) continue;
+        const currentEnergy = room.energyAvailable / room.energyCapacityAvailable;
+
+        if (!room.memory.meanEnergy) room.memory.meanEnergy = currentEnergy;
+        else room.memory.meanEnergy += currentEnergy;
+        console.log("Energy update: " + (currentEnergy * 100) + "%, running total: " + (room.memory.meanEnergy * 100) + "%");
+    }
+}
+
+function updateRoleDemands() {
+    for (var name in Game.rooms) {
+        var room = Game.rooms[name];
+        if (!room.memory.numUpgraders) room.memory.numUpgraders = 0;
+        if (room.memory.meanEnergy > 0.5) {
+            console.log("Increasing number of upgraders");
+            room.memory.numUpgraders++;
+        } else {
+            console.log("Decreasing number of upgraders");
+            room.memory.numUpgraders = u.clamp(room.memory.numUpgraders - 1, 0, room.memory.numUpgraders);
+        }
+    }
+}
 
 module.exports.loop = function () {
     const spawn1 = Game.spawns["Spawn1"];
@@ -21,11 +60,19 @@ module.exports.loop = function () {
         }
     }
 
-    const towers = spawn1.room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType == STRUCTURE_TOWER });
-    for (var x in towers) {
-        const tower = towers[x];
-        const target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if (target) tower.attack(target);
+    runTowers(spawn1);
+
+    if (Game.time % 50 == 0)
+        updateResourceTracking();
+
+    if (Game.time % 500 == 0) {
+        for (var name in Game.rooms) {
+            var room = Game.rooms[name];
+            room.memory.meanEnergy = room.memory.meanEnergy / 10;
+            console.log("Big energy update: " + (room.memory.meanEnergy * 100) + "%");
+        }
+        updateRoleDemands();
+        room.memory.meanEnergy = 0;
     }
 
     const builders = _.filter(Game.creeps, function(creep){
@@ -60,7 +107,7 @@ module.exports.loop = function () {
     } else if (Object.keys(haulers).length < numHaulers) {
         const name = "Hauler" + Game.time;
         spawn1.spawnCreep([MOVE, CARRY, CARRY, CARRY, MOVE], name, {memory: { role: "hauler", enabled: true }});
-    } else if (Object.keys(upgraders).length < numUpgraders) {
+    } else if (Object.keys(upgraders).length < spawn1.room.memory.numUpgraders) {
         const name = "Upgrader" + Game.time;
         spawn1.spawnCreep([WORK, WORK, CARRY, CARRY, MOVE, MOVE], name, {memory: { role: "upgrader", enabled: true }});
     } else if (Object.keys(builders).length < numBuilders) {
