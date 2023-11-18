@@ -112,7 +112,7 @@ module.exports.loop = function () {
         spawn1.spawnCreep([WORK, WORK, CARRY, CARRY, MOVE, MOVE], name, {memory: { role: "upgrader", enabled: true }});
     } else if (Object.keys(builders).length < numBuilders) {
         const name = "Builder" + Game.time;
-        spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "builder", enabled: true }});
+        spawn1.spawnCreep([WORK, Carry, WORK, CARRY, MOVE], name, {memory: { role: "builder", enabled: true }});
     } else if (Object.keys(repairers).length < numRepairers) {
         const name = "Repairer" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "repairer", enabled: true }});
