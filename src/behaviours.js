@@ -10,27 +10,50 @@ function findEnergyStorage(room) {
 /**
  * Move to the energy store with the most energy and withdraw some from it.
  **/
-function findAndWithdrawEnergy(creep, preferred) {
-    const stores = findEnergyStorage(creep.room);
-    var best = 0;
-    var most = 0;
-    for (var x in stores) {
-        const energy = stores[x].store[RESOURCE_ENERGY];
-        if (energy > most) {
-            best = x;
-            most = energy;
+function findAndWithdrawEnergy(creep, id) {
+    var target = Game.getObjectById(id);
+    if (!target) {
+        target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
+            const type = res.structureType;
+            return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION) && res.store[RESOURCE_ENERGY] > 0;
+        }});
+        if(!target) return "";
+    }
+    const err = creep.withdraw(target, RESOURCE_ENERGY);
+    if (err == ERR_FULL) {
+        return target.id;
+    } else {
+        if (err == ERR_NOT_ENOUGH_RESOURCES || creep.moveTo(target, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH) {
+            target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
+                const type = res.structureType;
+                return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION) && res.id !== target.id && res.store[RESOURCE_ENERGY] > 0;
+            }});
         }
     }
-    const src = stores[best];
-    if (creep.withdraw(src, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        if (creep.moveTo(src, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH) {
-            best = u.clampLength(best + 1, stores);
-        }
+    return target ? target.id : "";
+}
+
+function findAndTransferEnergy(creep, id) {
+    var target = Game.getObjectById(id);
+    if (!target) {
+        target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
+            const type = res.structureType;
+            return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION) && res.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+        }});
+        if(!target) return "";
     }
-    return best;
+    const err = creep.transfer(target, RESOURCE_ENERGY);
+    if (err == ERR_FULL || (err == ERR_NOT_IN_RANGE && creep.moveTo(target, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH)) {
+        target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
+            const type = res.structureType;
+            return (type == STRUCTURE_SPAWN || type == STRUCTURE_EXTENSION) && res.id !== target.id && res.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+        }});
+    }
+    return target ? target.id : "";
 }
 
 module.exports = {
     findEnergyStorage: findEnergyStorage,
     findAndWithdrawEnergy: findAndWithdrawEnergy,
+    findAndTransferEnergy: findAndTransferEnergy,
 };
