@@ -41,11 +41,11 @@ function updateRoleDemands() {
         var room = Game.rooms[name];
         if (!room.memory.numUpgraders) room.memory.numUpgraders = 0;
         if (room.memory.meanEnergy > 0.5) {
-            console.log("Increasing number of upgraders");
             room.memory.numUpgraders++;
+            console.log("Increasing number of upgraders to " + room.memory.numUpgraders);
         } else {
-            console.log("Decreasing number of upgraders");
             room.memory.numUpgraders = u.clamp(room.memory.numUpgraders - 1, 0, room.memory.numUpgraders);
+            console.log("Decreasing number of upgraders to " + room.memory.numUpgraders);
         }
     }
 }
