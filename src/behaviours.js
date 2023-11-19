@@ -52,8 +52,28 @@ function findAndTransferEnergy(creep, id) {
     return target ? target.id : "";
 }
 
+function findAndTransferResource(creep, resource, id) {
+    var target = Game.getObjectById(id);
+    if (!target) {
+        target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
+            const type = res.structureType;
+            return type == STRUCTURE_STORAGE && res.store.getFreeCapacity(resource) > 0;
+        }});
+        if(!target) return "";
+    }
+    const err = creep.transfer(target, resource);
+    if (err == ERR_FULL || (err == ERR_NOT_IN_RANGE && creep.moveTo(target, { visualizePathStyle: { stroke: "#fff" } }) == ERR_NO_PATH)) {
+        target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function(res) {
+            const type = res.structureType;
+            return type == STRUCTURE_STORAGE && res.id !== target.id && res.store.getFreeCapacity(resource) > 0;
+        }});
+    }
+    return target ? target.id : "";
+}
+
 module.exports = {
     findEnergyStorage: findEnergyStorage,
     findAndWithdrawEnergy: findAndWithdrawEnergy,
     findAndTransferEnergy: findAndTransferEnergy,
+    findAndTransferResource: findAndTransferResource,
 };

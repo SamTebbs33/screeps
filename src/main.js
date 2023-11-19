@@ -3,6 +3,7 @@ const upgraderRole = require("upgrader.role");
 const repairerRole = require("repairer.role");
 const haulerRole = require("hauler.role");
 const minerRole = require("miner.role");
+const scavengerRole = require("scavenger.role");
 
 const u = require("utils");
 
@@ -10,6 +11,7 @@ const numHaulers = 8;
 const numUpgraders = 5;
 const numBuilders = 2;
 const numRepairers = 1;
+const numScavengers = 1;
 
 
 function runTowers(spawn) {
@@ -90,6 +92,9 @@ module.exports.loop = function () {
     const miners = _.filter(Game.creeps, function(creep){
         return creep.memory.role === "miner";
     });
+    const scavengers = _.filter(Game.creeps, function(creep){
+        return creep.memory.role === "scavenger";
+    });
     
     var miners1 = 0;
     var miners0 = 0;
@@ -116,6 +121,9 @@ module.exports.loop = function () {
     } else if (Object.keys(repairers).length < numRepairers) {
         const name = "Repairer" + Game.time;
         spawn1.spawnCreep([WORK, CARRY, MOVE], name, {memory: { role: "repairer", enabled: true }});
+    } else if (Object.keys(scavengers).length < numScavengers) {
+        const name = "Scavenger" + Game.time;
+        spawn1.spawnCreep([CARRY, CARRY, MOVE], name, {memory: { role: "scavenger", enabled: true }});
     }
 
     if (!disableBuilders) {
@@ -141,5 +149,9 @@ module.exports.loop = function () {
     for (var name in miners) {
         var creep = miners[name];
         if (creep.memory.enabled) minerRole.run(creep);
+    }
+    for (var name in scavengers) {
+        var creep = scavengers[name];
+        if (creep.memory.enabled) scavengerRole.run(creep);
     }
 }
